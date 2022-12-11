@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+generator client {
+  provider = "prisma-client-js"
+}
+model Event {
+  id String @id @default(cuid())  
+  eventName String
+  registeredUsers EventUser[] 
+}
+
+
+model User {
+  id    String @id @default(cuid()) 
+  email String  @unique
+  name  String
+  password String
+  teacherId String?
+  teacher   User?   @relation("TeacherStudents", fields: [teacherId], references: [id])
+  students  User[]  @relation("TeacherStudents")
+  selectedEvents EventUser[] 
+}
+
+model EventUser{
+  id String @default(cuid()) 
+  event Event  @relation( fields: [eventId], references: [id])
+  user User  @relation( fields: [userId], references: [id])
+  eventId String
+  userId String
+  @@id([eventId, userId])
+}
